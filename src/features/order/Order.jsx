@@ -90,7 +90,7 @@ function Order() {
         </p>
       </div>
 
-      <ul className='divide-stone-200 divide-y border-b border-t'>
+      <ul className="divide-y divide-stone-200 border-b border-t">
         {cart.map((item) => (
           <OrderItem item={item} key={item.id} />
         ))}
