@@ -29,8 +29,21 @@ const cartslice = createSlice({
       const item = state.cart.find(item.pizzaID === action.payload);
 
       item.quantity++;
+      item.totalPrice = item.quantity * item.itemPrice;
     },
-    decreaseItem(state, action) {},
-    clearCart(state, action) {},
+    decreaseItem(state, action) {
+      const item = state.cart.find(item.pizzaID === action.payload);
+
+      item.quantity--;
+      item.totalPrice = item.quantity * item.itemPrice;
+    },
+    clearCart(state, action) {
+      state.cart=[];
+    },
   },
 });
+
+
+export const {addItem,deleteItem , increaseItems , decreaseItem , clearCart} = cartslice.actions;
+
+export default cartslice.reducer;

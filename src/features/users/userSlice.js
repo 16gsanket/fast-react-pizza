@@ -23,6 +23,8 @@ async function fetchAddress() {
 
 
 */
+import { createSlice } from '@reduxjs/toolkit';
+
 const initialState = {
   username: '',
 };
@@ -39,4 +41,5 @@ const userSlice = createSlice({
 export const { updateUser } = userSlice.actions;
 
 export default userSlice.reducer;
-import { createSlice } from '@reduxjs/toolkit';
+
+
