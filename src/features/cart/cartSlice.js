@@ -4,7 +4,7 @@ const initialState = {
     {
       pizzaID: 12,
       name: 'Mediterrenean',
-      quantity: 2,
+      quantity: 1,
       itemPrice: 16,
       totalPrice: 16,
     },
@@ -38,12 +38,14 @@ const cartslice = createSlice({
       item.totalPrice = item.quantity * item.itemPrice;
     },
     clearCart(state, action) {
-      state.cart=[];
+      state.cart = [];
     },
   },
 });
 
-
-export const {addItem,deleteItem , increaseItems , decreaseItem , clearCart} = cartslice.actions;
+export const { addItem, deleteItem, increaseItems, decreaseItem, clearCart } =
+  cartslice.actions;
 
 export default cartslice.reducer;
+
+export const getTotalCartPrice = (state) => state.cart.cart.reduce((sum, item) => sum + item.quantity, 0)
