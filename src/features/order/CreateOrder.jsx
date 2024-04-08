@@ -1,7 +1,13 @@
-import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Form, redirect, useActionData, useNavigation } from 'react-router-dom';
 import { createOrder } from '../../services/apiRestaurant';
 import Button from '../../ui/Button';
+import { clearCart, getCart } from '../cart/cartSlice';
+import EmptyCart from '../cart/EmptyCart';
+import { getTotalCartPrice } from '../cart/cartSlice';
+import {formatCurrency} from '../../utils/helpers'
+import store from '../../store'
+import { useState } from 'react';
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -34,12 +40,23 @@ const fakeCart = [
 ];
 
 function CreateOrder() {
-  // const [withPriority, setWithPriority] = useState(false);
-  const cart = fakeCart;
+  const [withPriority, setWithPriority] = useState(false);
+  const user_name= useSelector(state=>state.user.username)
+
+  const cart = useSelector(getCart)
+  const cart_total_price = useSelector(getTotalCartPrice)
+
+  const priority_price = withPriority ? cart_total_price+ cart_total_price*0.2 : 0;
+
+  const cart_price_with_priority = cart_total_price + priority_price;
+
+  // const cart = fakeCart;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
 
   const formErrors = useActionData();
+
+  if(cart.length === 0) return <EmptyCart />;
 
   return (
     <div className="px-4 py-6">
@@ -53,7 +70,7 @@ function CreateOrder() {
             type="text"
             name="customer"
             required
-           
+            value={user_name}
           />
         </div>
 
@@ -82,8 +99,8 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            value={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
             className="h-6 w-6 accent-yellow-400 focus:outline-none focus:ring-yellow-400 focus:ring-offset-2"
           />
           <label htmlFor="priority" className="font-medium">
@@ -95,7 +112,8 @@ function CreateOrder() {
           <input type="hidden" value={JSON.stringify(cart)} name="cart" />
 
           <Button type="primary" disabled={isSubmitting}>
-            Order now
+            {/* Order now {formatCurrency(cart_total_price)} */}
+            Order now {formatCurrency(cart_price_with_priority)}
           </Button>
 
           {isSubmitting ? <p>Ordering </p> : <p>Order Now!</p>}
@@ -139,7 +157,7 @@ export async function action({ request }) {
 
   const order = {
     ...data,
-    priority: data.priority === 'on',
+    priority: data.priority === 'true',
     cart: JSON.parse(data.cart),
   };
 
@@ -151,7 +169,8 @@ export async function action({ request }) {
   if (Object.keys(errors).length > 0) return errors;
 
   const new_Order = await createOrder(order);
-
+  
+  store.dispatch(clearCart())
   return redirect(`/order/${new_Order.id}`);
 }
 
